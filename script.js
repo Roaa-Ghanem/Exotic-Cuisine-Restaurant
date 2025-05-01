@@ -11,36 +11,51 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Mobile menu toggle
-  const mobileMenuBtn = document.createElement("div");
-  mobileMenuBtn.classList.add("mobile-menu-btn");
-  mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+  const mobileMenuBtn = document.getElementById("mobile-menu-toggle");
+  const navContainer = document.querySelector(".nav-container");
+  const body = document.body;
 
-  const navIcons = document.querySelector(".nav-icons");
-  const nav = document.querySelector("nav");
-  const navLinks = document.querySelector(".nav-links");
+  mobileMenuBtn.addEventListener("click", function (e) {
+    e.stopPropagation(); // Prevent event from bubbling to document
+    navContainer.classList.toggle("active");
 
-  nav.insertBefore(mobileMenuBtn, navIcons);
-
-  mobileMenuBtn.addEventListener("click", function () {
-    navLinks.classList.toggle("active");
-    // Change icon based on menu state
-    if (navLinks.classList.contains("active")) {
+    // Lock body scroll when menu is open
+    if (navContainer.classList.contains("active")) {
       mobileMenuBtn.innerHTML = '<i class="fas fa-times"></i>';
+      body.style.overflow = "hidden";
     } else {
       mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      body.style.overflow = "";
     }
   });
 
   // Close mobile menu when clicking outside
   document.addEventListener("click", function (event) {
     if (
-      navLinks.classList.contains("active") &&
-      !navLinks.contains(event.target) &&
+      navContainer.classList.contains("active") &&
+      !navContainer.contains(event.target) &&
       !mobileMenuBtn.contains(event.target)
     ) {
-      navLinks.classList.remove("active");
+      navContainer.classList.remove("active");
       mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      body.style.overflow = "";
     }
+  });
+
+  // Prevent menu close when clicking inside the menu
+  navContainer.addEventListener("click", function (e) {
+    e.stopPropagation();
+  });
+
+  // Make sure nav links in mobile menu close the menu when clicked
+  document.querySelectorAll(".nav-links a, .nav-icons a").forEach((link) => {
+    link.addEventListener("click", function () {
+      if (window.innerWidth <= 768) {
+        navContainer.classList.remove("active");
+        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        body.style.overflow = "";
+      }
+    });
   });
 
   // Smooth scroll for anchor links
@@ -54,8 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
         // Close mobile menu if open
-        if (navLinks.classList.contains("active")) {
-          navLinks.classList.remove("active");
+        if (navContainer.classList.contains("active")) {
+          navContainer.classList.remove("active");
           mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
         }
 
